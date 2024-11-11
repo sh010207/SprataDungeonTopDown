@@ -6,6 +6,7 @@ public class TopDownShooting : MonoBehaviour
     private Vector2 aimDirection = Vector2.right;
 
     [SerializeField] private Transform projectileSpawnPosition;
+    [SerializeField] private AudioClip ShootingClip;
 
     private void Awake()
     {
@@ -15,9 +16,9 @@ public class TopDownShooting : MonoBehaviour
     void Start()
     {
         contoller.OnAttackEvent += OnShoot;
-        // OnLookEvent¿¡ ÀÌÁ¦ µÎ°³°¡ µî·ÏµÇ´Â °Í(ÇÏ³ª´Â Áö³­ ½Ã°£¿¡ µî·ÏÇß¾úÁÒ? TopDownAimRotation.OnAim(Vec2)
-        // ÇÑ °³ÀÇ µ¨¸®°ÔÀÌÆ®¿¡ ¿©·¯ °³ÀÇ ÇÔ¼ö°¡ µî·ÏµÇ¾îÀÖ´Â °ÍÀ» multicast delegate¶ó°í ÇÔ.
-        // ActionÀÌ³ª Funcµµ µ¨¸®°ÔÀÌÆ®ÀÇ ÀÏÁ¾ÀÎ °Í ±â¾ïÇÏ½ÃÁÒ..?
+        // OnLookEventï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Î°ï¿½ï¿½ï¿½ ï¿½ï¿½ÏµÇ´ï¿½ ï¿½ï¿½(ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ß¾ï¿½ï¿½ï¿½? TopDownAimRotation.OnAim(Vec2)
+        // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ ï¿½ï¿½ÏµÇ¾ï¿½ï¿½Ö´ï¿½ ï¿½ï¿½ï¿½ï¿½ multicast delegateï¿½ï¿½ï¿½ ï¿½ï¿½.
+        // Actionï¿½Ì³ï¿½ Funcï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ï½ï¿½ï¿½ï¿½..?
         contoller.OnLookEvent += OnAim;
     }
 
@@ -26,6 +27,7 @@ public class TopDownShooting : MonoBehaviour
         aimDirection = newAimDirection;
     }
 
+    // ReSharper disable Unity.PerformanceAnalysis
     private void OnShoot(AttackSO attackSO)
     {
         RangedAttackSO RangedAttackSO = attackSO as RangedAttackSO;
@@ -44,16 +46,17 @@ public class TopDownShooting : MonoBehaviour
         }
     }
 
-    private void CreateProjectile(RangedAttackSO RangedAttackSO, float angle)
+    private void CreateProjectile(RangedAttackSO rangedAttackSo, float angle)
     {
-        // ¿ÀºêÁ§Æ® Ç®À» È°¿ëÇÑ »ý¼ºÀ¸·Î º¯°æ
-        GameObject obj = GameManager.Instance.ObjectPool.SpawnFromPool(RangedAttackSO.bulletNameTag);
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ® Ç®ï¿½ï¿½ È°ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+        GameObject obj = GameManager.Instance.ObjectPool.SpawnFromPool(rangedAttackSo.bulletNameTag);
         
-        // ¹ß»çÃ¼ ±âº» ¼¼ÆÃ
+        // ï¿½ß»ï¿½Ã¼ ï¿½âº» ï¿½ï¿½ï¿½ï¿½
         obj.transform.position = projectileSpawnPosition.position;
         ProjectileController attackController = obj.GetComponent<ProjectileController>();
-        attackController.InitializeAttack(RotateVector2(aimDirection, angle), RangedAttackSO);
-
+        attackController.InitializeAttack(RotateVector2(aimDirection, angle), rangedAttackSo);
+        
+        if(ShootingClip) SoundManager.PlayClip(ShootingClip);
         obj.SetActive(true);
     }
 

@@ -110,7 +110,14 @@ public class ProjectileController : MonoBehaviour
     {
         if (createFx)
         {
-            // TODO : ParticleSystem에 대해서 배우고, 무기 NameTag로 해당하는 FX가져오기
+            ParticleSystem particleSystem = GameManager.Instance.EffectParticle;
+            
+            particleSystem.transform.position = position;
+            ParticleSystem.EmissionModule em = particleSystem.emission;
+            em.SetBurst(0,new ParticleSystem.Burst(0,Mathf.Ceil(_attackData.size * 5)));
+            ParticleSystem.MainModule mm = particleSystem.main;
+            mm.startSpeedMultiplier = _attackData.size * 10f;
+            particleSystem.Play();
         }
         gameObject.SetActive(false);
     }

@@ -1,9 +1,11 @@
-﻿using System;
+﻿
+using System;
 using UnityEngine;
 
 public class HealthSystem : MonoBehaviour
 {
     [SerializeField] private float healthChangeDelay = .5f;
+    [SerializeField] private AudioClip damageSound;
 
     private CharacterStatHandler _statsHandler;
     private float _timeSinceLastChange = float.MaxValue;
@@ -15,6 +17,8 @@ public class HealthSystem : MonoBehaviour
     public event Action OnInvincibilityEnd;
 
     public float CurrentHealth { get; private set; }
+    private float currentInvincibilityTime = 0f;
+    private bool isAttacked = false;
 
     // get만 구현된 것처럼 프로퍼티를 사용하는 것
     // 이렇게 하면 데이터의 복제본이 여기저기 돌아다니다가 싱크가 깨지는 문제를 막을 수 있어요!
@@ -27,7 +31,7 @@ public class HealthSystem : MonoBehaviour
 
     private void Start()
     {
-        CurrentHealth = _statsHandler.CurrentStat.maxHealth;
+        CurrentHealth = MaxHealth;
     }
 
     private void Update()
@@ -38,12 +42,15 @@ public class HealthSystem : MonoBehaviour
             if (_timeSinceLastChange >= healthChangeDelay)
             {
                 OnInvincibilityEnd?.Invoke();
+                currentInvincibilityTime = 0f;
+                isAttacked = false;
             }
         }
     }
 
     public bool ChangeHealth(float change)
     {
+        
         if (change == 0 || _timeSinceLastChange < healthChangeDelay)
         {
             return false;
@@ -69,6 +76,8 @@ public class HealthSystem : MonoBehaviour
         else
         {
             OnDamage?.Invoke();
+            isAttacked = true;
+            if(damageSound) SoundManager.PlayClip(damageSound);
         }
         return true;
     }
