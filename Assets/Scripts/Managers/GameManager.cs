@@ -8,9 +8,23 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using Random = UnityEngine.Random;
 
+public enum UpgradeOption
+{
+    MaxHealth,
+    AttackPower,
+    Speed,
+    Knockbak,
+    AttackDelay,
+    NumberOfProjectiles,
+    COUNT
+}
+
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
+
+    [SerializeField] private CharacterStat defalutStat;
+    [SerializeField] private CharacterStat rangedStat;
 
     public Transform Player { get; private set; }
     public ObjectPool ObjectPool { get; private set; }
@@ -35,6 +49,7 @@ public class GameManager : MonoBehaviour
     
     [SerializeField] private string playerTag = "Player";
 
+    [SerializeField] private List<GameObject> rewards = new List<GameObject>();
     private void Awake()
     {
         if (Instance != null) Destroy(gameObject);
@@ -50,11 +65,21 @@ public class GameManager : MonoBehaviour
         playerHealth.OnHeal += UpdateHealthUI;
         playerHealth.OnDeath += GameOver;
 
+        UpgradeStatInit();
 
         for(int i = 0; i < spawnPositionsRoot.childCount; i++)
         {
             spawnPositions.Add(spawnPositionsRoot.GetChild(i));
         }
+    }
+
+    private void UpgradeStatInit()
+    {
+        defalutStat.statsChangeType = StatsChangeType.Add;
+        defalutStat.attackSO = Instantiate(defalutStat.attackSO);
+
+        rangedStat.statsChangeType = StatsChangeType.Add;
+        rangedStat.attackSO = Instantiate(rangedStat.attackSO);
     }
 
     private void Start()
@@ -99,6 +124,9 @@ public class GameManager : MonoBehaviour
     {
         int prefabidx = Random.Range(0, enemyPrefabs.Count);
         GameObject enemy = Instantiate(enemyPrefabs[prefabidx], spawnPositions[posidx].position, Quaternion.identity);
+        enemy.GetComponent <CharacterStatHandler>().AddStatModifiers(defalutStat);
+        enemy.GetComponent<CharacterStatHandler>().AddStatModifiers(rangedStat);
+
         enemy.GetComponent<HealthSystem>().OnDeath += OnEnemyDeath;
         currentSpawnCount++;
 
@@ -136,7 +164,11 @@ public class GameManager : MonoBehaviour
     }
     private void CreateReward()
     {
-        Debug.Log("Reward호출");
+        int selectedRewardIndex = Random.Range(0,rewards.Count);
+        int randomPositionindex = Random.Range(0, spawnPositions.Count);
+
+        GameObject obj = rewards[selectedRewardIndex];
+        Instantiate(obj, spawnPositions[randomPositionindex].position, Quaternion.identity);
     }
     private void IncreaseSpawnPositions()
     {
@@ -145,7 +177,39 @@ public class GameManager : MonoBehaviour
     }
     private void RandomUpgrade()
     {
-        Debug.Log("RadomUpgrade호출");
+        UpgradeOption option = (UpgradeOption)Random.Range(0, (int)UpgradeOption.COUNT);
+        switch(option)
+        {
+            case UpgradeOption.MaxHealth:
+                defalutStat.maxHealth += 2;
+                break;
+
+            case UpgradeOption.AttackPower:
+                defalutStat.attackSO.power += 1;
+                break;
+
+            case UpgradeOption.Speed:
+                defalutStat.speed += 0.1f;
+                break;
+
+            case UpgradeOption.Knockbak:
+                defalutStat.attackSO.isOnKnockback = true;
+                defalutStat.attackSO.knockbackPower += 1;
+                defalutStat.attackSO.knockbackTime += 0.1f;
+                break;
+
+            case UpgradeOption.AttackDelay:
+                defalutStat.attackSO.delay -= 0.05f;
+                break;
+
+            case UpgradeOption.NumberOfProjectiles:
+                RangedAttackSO rangedAttackData = rangedStat.attackSO as RangedAttackSO;
+                if (rangedAttackData != null) rangedAttackData.numberofProjectilesPerShot += 1;
+                break;
+
+            default:
+                break;
+        }
     }
 
     private void GameOver()

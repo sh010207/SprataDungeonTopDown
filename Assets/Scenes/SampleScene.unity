@@ -5387,6 +5387,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1bec6ff980cb4a44b814cacb83eee8a7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  defalutStat:
+    statsChangeType: 0
+    maxHealth: 0
+    speed: 0
+    attackSO: {fileID: 11400000, guid: 7f546634dd01cb84fa46b0fbde189e81, type: 2}
+  rangedStat:
+    statsChangeType: 0
+    maxHealth: 0
+    speed: 0
+    attackSO: {fileID: 11400000, guid: 64be95ab4150e584b9b0ce9c91e0818f, type: 2}
   EffectParticle: {fileID: 0}
   waveText: {fileID: 1911518282}
   hpGaugeSlider: {fileID: 2015974303}
@@ -5398,6 +5408,10 @@ MonoBehaviour:
   - {fileID: 3488683658982175108, guid: a738b03f57f60204aa2b3bebd7ebeca0, type: 3}
   spawnPositionsRoot: {fileID: 1065734821}
   playerTag: Player
+  rewards:
+  - {fileID: 6099465295583103206, guid: 3575bff7f4f74104e8fefe3aecaa242f, type: 3}
+  - {fileID: 8392178719196450142, guid: b724d1b3099f2b44d83c24de7909e5e6, type: 3}
+  - {fileID: 5537547653419245041, guid: 6c913c0d0e092e9489526a790eaac8e1, type: 3}
 --- !u!4 &253197284
 Transform:
   m_ObjectHideFlags: 0
